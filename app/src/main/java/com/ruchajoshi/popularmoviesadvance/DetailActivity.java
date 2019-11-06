@@ -14,20 +14,26 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.ruchajoshi.popularmoviesadvance.adapter.MovieAdapter;
 import com.ruchajoshi.popularmoviesadvance.adapter.ReviewAdapter;
 import com.ruchajoshi.popularmoviesadvance.adapter.TrailerAdapter;
 import com.ruchajoshi.popularmoviesadvance.database.MovieViewModel;
 import com.ruchajoshi.popularmoviesadvance.model.Movie;
 import com.ruchajoshi.popularmoviesadvance.model.MovieResults;
+import com.ruchajoshi.popularmoviesadvance.model.MovieReviewList;
+import com.ruchajoshi.popularmoviesadvance.model.MovieTrailerList;
 import com.ruchajoshi.popularmoviesadvance.model.Review;
 import com.ruchajoshi.popularmoviesadvance.model.Trailer;
 import com.ruchajoshi.popularmoviesadvance.service.MovieService;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,15 +43,15 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class DetailActivity extends AppCompatActivity {
 
 
-    private List<Trailer> trailers;
-    private List<Review> reviews;
+
     private List<Movie> moviesList;
     private Observer<List<Movie>> observer;
 
     private TrailerAdapter trailerAdapter;
     private ReviewAdapter reviewAdapter;
-    private RecyclerView trailersList;
-    private RecyclerView reviewsList;
+
+    private Retrofit retrofit;
+    private  MovieService service;
 
     private MovieViewModel movieViewModel;
 
@@ -63,9 +69,12 @@ public class DetailActivity extends AppCompatActivity {
      TextView mMovieUserRating;
     @BindView(R.id.tv_synopsis)
      TextView mMovieOverView;
+    @BindView(R.id.rv_review)
+    RecyclerView mMovieReviewRecycleView;
+    @BindView(R.id.rv_trailers)
+    RecyclerView mMovieTrailerRecycleView;
 
     private int movieId;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -146,32 +155,56 @@ public class DetailActivity extends AppCompatActivity {
                 }
             });
 
-//            retrofit = new Retrofit.Builder()
-//                    .baseUrl("https://api.themoviedb.org/3/")
-//                    .addConverterFactory(GsonConverterFactory.create())
-//                    .build();
-//
-//            service = retrofit.create(MovieService.class);
-//
-//            final Call<MovieResults> gettoprated = service.getTopRated(BuildConfig.API_KEY);
-//            gettoprated.enqueue(new Callback<MovieResults>(){
-//                @Override
-//                public void onResponse(Call<MovieResults> call, Response<MovieResults> response) {
-//                    if(response.isSuccessful()){
-//                        mMovieAdapter.setMovies(response.body().getMovies());
-//                        Log.i("response sucess","sucess"+response.body().getMovies());
-//                    }
-//                    else{
-//                        Log.i("response failed","failed"+response.code());
-//                    }
-//
-//                }
-//
-//                @Override
-//                public void onFailure(Call<MovieResults> call, Throwable t) {
-//
-//                }
-//            });
+            retrofit = new Retrofit.Builder()
+                    .baseUrl("https://api.themoviedb.org/3/")
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
+
+            service = retrofit.create(MovieService.class);
+
+            final Call<MovieReviewList> getMovieReview = service.getMovieReview(movieId,BuildConfig.API_KEY);
+            getMovieReview.enqueue(new Callback<MovieReviewList>(){
+                @Override
+                public void onResponse(Call<MovieReviewList> call, Response<MovieReviewList> response) {
+                    if(response.isSuccessful()){
+                        reviewAdapter = new ReviewAdapter(response.body().getMovieReview());
+                        mMovieReviewRecycleView.setAdapter(reviewAdapter);
+                        Log.i("review sucess","sucess"+response.body().getMovieReview());
+                    }
+                    else{
+                        Log.i("review failed","failed"+response.code());
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<MovieReviewList> call, Throwable t) {
+
+                }
+
+            });
+
+            final Call<MovieTrailerList> getTrailers= service.getMovieTrailer(movieId,BuildConfig.API_KEY);
+            getTrailers.enqueue(new Callback<MovieTrailerList>(){
+
+
+                @Override
+                public void onResponse(Call<MovieTrailerList> call, Response<MovieTrailerList> response) {
+                    if(response.isSuccessful()){
+                        trailerAdapter = new TrailerAdapter(response.body().getMovieTrailer());
+                        mMovieTrailerRecycleView.setAdapter(trailerAdapter);
+                        Log.i("video sucess","sucess"+response.body().getMovieTrailer());
+                    }
+                    else{
+                        Log.i("video failed","failed"+response.code());
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<MovieTrailerList> call, Throwable t) {
+
+                }
+            } );
 
 
         }

@@ -3,6 +3,8 @@ package com.ruchajoshi.popularmoviesadvance.service;
 
 import com.ruchajoshi.popularmoviesadvance.model.Movie;
 import com.ruchajoshi.popularmoviesadvance.model.MovieResults;
+import com.ruchajoshi.popularmoviesadvance.model.MovieReviewList;
+import com.ruchajoshi.popularmoviesadvance.model.MovieTrailerList;
 
 import java.util.List;
 
@@ -20,9 +22,9 @@ public interface MovieService {
     Call<MovieResults> getTopRated(@Query("api_key") String apiKey);
 
     @GET("{id}/reviews")
-    Call<MovieResults> getMovieReview(@Path("id") int movieId, @Query("api_key") String apiKey);
+    Call<MovieReviewList> getMovieReview(@Path("id") int movieId, @Query("api_key") String apiKey);
 
     @GET("{id}/videos")
-    Call<MovieResults> getMovieTrailer(@Path("id") int movieId, @Query("api_key") String apiKey);
+    Call<MovieTrailerList> getMovieTrailer(@Path("id") int movieId, @Query("api_key") String apiKey);
 
 }
