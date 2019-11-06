@@ -1,6 +1,7 @@
 package com.ruchajoshi.popularmoviesadvance;
 
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -69,6 +70,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
 
         mMovieAdapter = new MovieAdapter(getApplicationContext(),new ArrayList<Movie>(),MovieActivity.this);
         int mNoOfColumns = calculateNoOfColumns(getApplicationContext());
+        movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, mNoOfColumns);
         mDisplayMovieRecycleView.setLayoutManager(layoutManager);
@@ -87,6 +89,8 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
     }
 
     private void loadMovieData() {
+        Log.i("currentSort","-"+currentSort);
+
         if(isInternetAvailable()){
             showResult();
             if(currentSort.equals(SORT_POPULAR)){
@@ -153,6 +157,9 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                 @Override
                 public void onChanged(@Nullable List<Movie> movies) {
                     mMovieAdapter.setMovies(movies);
+                    Log.i("favmovies","-"+movies.size());
+                    Log.i("favmovies","-"+movies.get(1).getTitle());
+
                 }
             };
 

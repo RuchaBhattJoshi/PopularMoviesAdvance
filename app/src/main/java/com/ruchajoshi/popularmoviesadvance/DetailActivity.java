@@ -83,7 +83,6 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
-
        movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
         movieViewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
@@ -183,6 +182,7 @@ public class DetailActivity extends AppCompatActivity {
                 }
 
             });
+
 
             final Call<MovieTrailerList> getTrailers= service.getMovieTrailer(movieId,BuildConfig.API_KEY);
             getTrailers.enqueue(new Callback<MovieTrailerList>(){
