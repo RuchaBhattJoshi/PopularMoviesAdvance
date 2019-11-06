@@ -177,7 +177,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clickable="true"
-            android:src="@drawable/ic_favorite_border_black_24dp"
             android:paddingTop="@dimen/padding"
             android:paddingEnd="@dimen/padding"
             app:layout_constraintTop_toBottomOf="@+id/img_movie_cover"

@@ -101,10 +101,10 @@ public class DetailActivity extends AppCompatActivity {
 
             if(movieViewModel.isMovieFavorited(movieId))
             {
-                mMovieFavButton.setBackgroundColor(Color.YELLOW);
+                mMovieFavButton.setBackgroundResource(R.drawable.ic_favorite_solid_24dp);
             }
             else {
-                mMovieFavButton.setBackgroundColor(Color.LTGRAY);
+                mMovieFavButton.setBackgroundResource(R.drawable.ic_favorite_border_black_24dp);
             }
 
             mMovieTitle.setText(movieData.getTitle());
@@ -133,12 +133,12 @@ public class DetailActivity extends AppCompatActivity {
                         movieViewModel.delete(movieData);
                         Toast.makeText(DetailActivity.this,"Removed from favorites",Toast.LENGTH_LONG)
                                 .show();
-                        mMovieFavButton.setBackgroundColor(Color.LTGRAY);
+                        mMovieFavButton.setBackgroundResource(R.drawable.ic_favorite_border_black_24dp);
 
                     }
                     else {
                         movieViewModel.insert(movieData);
-                        mMovieFavButton.setBackgroundColor(Color.YELLOW);
+                        mMovieFavButton.setBackgroundResource(R.drawable.ic_favorite_solid_24dp);
                         Toast.makeText(DetailActivity.this,"Inserted into favorites",Toast.LENGTH_LONG)
                                 .show();
                     }
