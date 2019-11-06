@@ -1,26 +1,46 @@
 package com.ruchajoshi.popularmoviesadvance.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
+@Entity(tableName = "movies")
 public class Movie implements Parcelable {
 
-    private String movieTitle;
-    private String moviePoster;
-    private String movieReleaseDate;
-    private String movieUserRating;
-    private String movieOverview;
+    @PrimaryKey
+    private int id;
+    private String title;
+    private String release_date;
+    private double vote_average;
+    private int vote_count;
+    private String poster_path;
+    private String overview;
 
-    public Movie() {
 
+    public Movie(@NonNull int id, @NonNull String title, @NonNull String release_date, @NonNull double
+            vote_average, @NonNull int vote_count, @NonNull String poster_path, @NonNull String overview) {
+        this.id = id;
+        this.title = title;
+        this.release_date = release_date;
+        this.vote_average = vote_average;
+        this.vote_count = vote_count;
+        this.poster_path = poster_path;
+        this.overview = overview;
     }
 
+
+    @Ignore
     protected Movie(Parcel in) {
-        movieTitle = in.readString();
-        moviePoster = in.readString();
-        movieReleaseDate = in.readString();
-        movieUserRating = in.readString();
-        movieOverview = in.readString();
+        id = in.readInt();
+        title = in.readString();
+        release_date = in.readString();
+        vote_average = in.readDouble();
+        vote_count = in.readInt();
+        poster_path = in.readString();
+        overview = in.readString();
     }
 
     public static final Creator<Movie> CREATOR = new Creator<Movie>() {
@@ -35,44 +55,60 @@ public class Movie implements Parcelable {
         }
     };
 
-    public String getMovieTitle() {
-        return movieTitle;
+    public int getId() {
+        return id;
     }
 
-    public void setMovieTitle(String movieTitle) {
-        this.movieTitle = movieTitle;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public String getMoviePoster() {
-        return moviePoster;
+    public String getTitle() {
+        return title;
     }
 
-    public void setMoviePoster(String moviePoster) {
-        this.moviePoster = moviePoster;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public String getMovieReleaseDate() {
-        return movieReleaseDate;
+    public String getRelease_date() {
+        return release_date;
     }
 
-    public void setMovieReleaseDate(String movieReleaseDate) {
-        this.movieReleaseDate = movieReleaseDate;
+    public void setRelease_date(String release_date) {
+        this.release_date = release_date;
     }
 
-    public String getMovieUserRating() {
-        return movieUserRating;
+    public double getVote_average() {
+        return vote_average;
     }
 
-    public void setMovieUserRating(String movieUserRating) {
-        this.movieUserRating = movieUserRating;
+    public void setVote_average(double vote_average) {
+        this.vote_average = vote_average;
     }
 
-    public String getMovieOverview() {
-        return movieOverview;
+    public int getVote_count() {
+        return vote_count;
     }
 
-    public void setMovieOverview(String movieOverview) {
-        this.movieOverview = movieOverview;
+    public void setVote_count(int vote_count) {
+        this.vote_count = vote_count;
+    }
+
+    public String getPoster_path() {
+        return poster_path;
+    }
+
+    public void setPoster_path(String poster_path) {
+        this.poster_path = "https://image.tmdb.org/t/p/w185" + poster_path;
+    }
+
+    public String getOverview() {
+        return overview;
+    }
+
+    public void setOverview(String overview) {
+        this.overview = overview;
     }
 
     @Override
@@ -81,11 +117,28 @@ public class Movie implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(movieTitle);
-        parcel.writeString(moviePoster);
-        parcel.writeString(movieReleaseDate);
-        parcel.writeString(movieUserRating);
-        parcel.writeString(movieOverview);
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(title);
+        dest.writeString(release_date);
+        dest.writeDouble(vote_average);
+        dest.writeInt(vote_count);
+        dest.writeString(poster_path);
+        dest.writeString(overview);
+    }
+
+
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", release_date='" + release_date + '\'' +
+                ", vote_average=" + vote_average +
+                ", vote_count=" + vote_count +
+                ", poster_path='" + poster_path + '\'' +
+                ", overview='" + overview + '\'' +
+                '}';
     }
 }
+

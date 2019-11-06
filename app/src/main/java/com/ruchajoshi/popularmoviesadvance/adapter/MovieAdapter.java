@@ -3,6 +3,7 @@ package com.ruchajoshi.popularmoviesadvance.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +47,9 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
     @Override
     public void onBindViewHolder(@NonNull MovieAdapterViewHolder movieAdapterViewHolder, int position) {
-        String movieToBind = movies.get(position).getMoviePoster();
+        String movieToBind = "https://image.tmdb.org/t/p/w185"+movies.get(position).getPoster_path();
+        Log.i("poster","-"+movieToBind);
+
         Picasso.get()
                 .load(movieToBind)
                 .placeholder(R.mipmap.ic_launcher)

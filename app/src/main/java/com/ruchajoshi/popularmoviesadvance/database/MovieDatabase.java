@@ -5,10 +5,17 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
-@Database(entities = {FavoriteMovie.class}, version = 3, exportSchema = false)
+import com.ruchajoshi.popularmoviesadvance.model.Movie;
+
+@Database(entities = {Movie.class}, version = 1, exportSchema = false)
+
 public abstract class MovieDatabase extends RoomDatabase{
+
     private static final String LOG_TAG = MovieDatabase.class.getSimpleName();
     private static final Object LOCK = new Object();
+
+    public abstract MovieDao movieDao();
+
     private static final String DATABASE_NAME = "movieslist";
     private static MovieDatabase sInstance;
 
@@ -24,5 +31,5 @@ public abstract class MovieDatabase extends RoomDatabase{
         return sInstance;
     }
 
-    public abstract MovieDao movieDao();
+
 }

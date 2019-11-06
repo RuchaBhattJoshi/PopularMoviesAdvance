@@ -8,22 +8,29 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import com.ruchajoshi.popularmoviesadvance.model.Movie;
+
 import java.util.List;
 
 @Dao
 public interface MovieDao {
-    @Query("SELECT * FROM FavMovies ORDER BY id")
-    LiveData<List<FavoriteMovie>> loadAllMovies();
+
+    @Query("SELECT * FROM movies ORDER BY id")
+    LiveData<List<Movie>> getMovies();
 
     @Insert
-    void insertMovie(FavoriteMovie favMovie);
+    void insertMovie(Movie movie);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateMovie(FavoriteMovie favMovie);
+    void updateMovie(Movie movie);
 
     @Delete
-    void deleteMovie(FavoriteMovie favMovie);
+    void deleteMovie(Movie movie);
 
-    @Query("SELECT * FROM FavMovies WHERE id = :id")
-    FavoriteMovie loadMovieById(int id);
+    @Query("DELETE FROM movies WHERE id= :id")
+    void deleteMovieByID(int id);
+
+    @Query("SELECT * FROM movies WHERE id = :id")
+    Movie getMovieById(int id);
+
 }

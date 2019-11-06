@@ -1,11 +1,12 @@
 package com.ruchajoshi.popularmoviesadvance;
 
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -19,11 +20,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.ruchajoshi.popularmoviesadvance.adapter.MovieAdapter;
+import com.ruchajoshi.popularmoviesadvance.database.MovieViewModel;
 import com.ruchajoshi.popularmoviesadvance.model.Movie;
 import com.ruchajoshi.popularmoviesadvance.model.MovieResults;
 import com.ruchajoshi.popularmoviesadvance.service.MovieService;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
@@ -52,6 +56,10 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
     private static String currentSort = SORT_POPULAR;
 
 
+    private MovieViewModel movieViewModel;
+    private Observer<List<Movie>> favouriteMoviesObserver;
+    private int sort = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +75,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
         mDisplayMovieRecycleView.setHasFixedSize(true);
         mDisplayMovieRecycleView.setAdapter(mMovieAdapter);
 
-        loadMovieData("popular");
+        loadMovieData();
 
     }
 
@@ -78,7 +86,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
         return noOfColumns;
     }
 
-    private void loadMovieData(String mQueryCategory ) {
+    private void loadMovieData() {
         if(isInternetAvailable()){
             showResult();
             if(currentSort.equals(SORT_POPULAR)){
@@ -95,6 +103,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                     public void onResponse(Call<MovieResults> call, Response<MovieResults> response) {
                         if(response.isSuccessful()){
                             mMovieAdapter.setMovies(response.body().getMovies());
+
                         }
                         else{
                             Log.i("response failed","failed"+response.code());
@@ -123,6 +132,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                     public void onResponse(Call<MovieResults> call, Response<MovieResults> response) {
                         if(response.isSuccessful()){
                             mMovieAdapter.setMovies(response.body().getMovies());
+                            Log.i("response sucess","sucess"+response.body().getMovies());
                         }
                         else{
                             Log.i("response failed","failed"+response.code());
@@ -139,8 +149,14 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
             }
         }
         else if(currentSort.equals(SORT_FAVORITE)){
+            favouriteMoviesObserver = new Observer<List<Movie>>() {
+                @Override
+                public void onChanged(@Nullable List<Movie> movies) {
+                    mMovieAdapter.setMovies(movies);
+                }
+            };
 
-
+            movieViewModel.getAllMovies().observe(this,favouriteMoviesObserver);
         }
         else{
             showErrorMessage();
@@ -185,19 +201,19 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
 
         if (menuItemSelected == R.id.action_most_popular && !currentSort.equals(SORT_POPULAR)) {
             currentSort = SORT_POPULAR;
-            loadMovieData("popular");
+            loadMovieData();
             return true;
         }
 
         if (menuItemSelected == R.id.action_top_rated && !currentSort.equals(SORT_TOP_RATED)) {
             currentSort = SORT_TOP_RATED;
-            loadMovieData("top_rated");
+            loadMovieData();
             return true;
         }
 
         if (menuItemSelected == R.id.action_favorite && !currentSort.equals(SORT_FAVORITE)) {
             currentSort = SORT_FAVORITE;
-            loadMovieData("favorite");
+            loadMovieData();
             return true;
         }
 
