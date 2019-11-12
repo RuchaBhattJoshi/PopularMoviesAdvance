@@ -40,7 +40,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewHold
         return reviews.size();
     }
 
-    class ReviewHolder extends RecyclerView.ViewHolder{
+    public class ReviewHolder extends RecyclerView.ViewHolder{
 
         public TextView author;
         public TextView content;

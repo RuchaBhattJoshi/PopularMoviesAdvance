@@ -43,7 +43,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class DetailActivity extends AppCompatActivity {
 
 
-
+    private static final String TAG = "Detail Activity";
     private List<Movie> moviesList;
     private Observer<List<Movie>> observer;
 
@@ -83,7 +83,7 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
 
-       movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
+         movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
         movieViewModel.getAllMovies().observe(this, new Observer<List<Movie>>() {
             @Override
@@ -106,6 +106,9 @@ public class DetailActivity extends AppCompatActivity {
             final Movie movieData= getIntent().getParcelableExtra("MovieData");
 
             movieId = movieData.getId();
+
+            Log.d(TAG, "movieId:- "+movieId);
+
 
             if(movieViewModel.isMovieFavorited(movieId))
             {
@@ -162,13 +165,14 @@ public class DetailActivity extends AppCompatActivity {
             service = retrofit.create(MovieService.class);
 
             final Call<MovieReviewList> getMovieReview = service.getMovieReview(movieId,BuildConfig.API_KEY);
+
             getMovieReview.enqueue(new Callback<MovieReviewList>(){
                 @Override
                 public void onResponse(Call<MovieReviewList> call, Response<MovieReviewList> response) {
                     if(response.isSuccessful()){
                         reviewAdapter = new ReviewAdapter(response.body().getMovieReview());
                         mMovieReviewRecycleView.setAdapter(reviewAdapter);
-                        Log.i("review sucess","sucess"+response.body().getMovieReview());
+                        Log.i("review sucess","sucess"+response.body().getMovieReview().get(1).getContent());
                     }
                     else{
                         Log.i("review failed","failed"+response.code());

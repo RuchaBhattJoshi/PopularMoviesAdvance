@@ -21,10 +21,10 @@ public interface MovieService {
     @GET("movie/top_rated")
     Call<MovieResults> getTopRated(@Query("api_key") String apiKey);
 
-    @GET("{id}/reviews")
+    @GET("movie/{id}/reviews")
     Call<MovieReviewList> getMovieReview(@Path("id") int movieId, @Query("api_key") String apiKey);
 
-    @GET("{id}/videos")
+    @GET("movie/{id}/videos")
     Call<MovieTrailerList> getMovieTrailer(@Path("id") int movieId, @Query("api_key") String apiKey);
 
 }
