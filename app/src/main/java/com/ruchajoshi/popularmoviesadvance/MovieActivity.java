@@ -151,20 +151,21 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                 });
 
             }
-        }
-        else if(currentSort.equals(SORT_FAVORITE)){
-            favouriteMoviesObserver = new Observer<List<Movie>>() {
-                @Override
-                public void onChanged(@Nullable List<Movie> movies) {
-                    mMovieAdapter.setMovies(movies);
-                    Log.i("favmovies","-"+movies.size());
-                    Log.i("favmovies","-"+movies.get(1).getTitle());
+            else if(currentSort.equals(SORT_FAVORITE)){
+                favouriteMoviesObserver = new Observer<List<Movie>>() {
+                    @Override
+                    public void onChanged(@Nullable List<Movie> movies) {
+                        mMovieAdapter.setMovies(movies);
+                        Log.i("favmovies","-"+movies.size());
+                        Log.i("favmovies","-"+movies.get(1).getTitle());
 
-                }
-            };
+                    }
+                };
 
-            movieViewModel.getAllMovies().observe(this,favouriteMoviesObserver);
+                movieViewModel.getAllMovies().observe(this,favouriteMoviesObserver);
+            }
         }
+
         else{
             showErrorMessage();
         }
