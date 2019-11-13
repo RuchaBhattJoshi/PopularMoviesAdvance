@@ -18,3 +18,25 @@ functionality in stage 2 project:
 
 
 Recall from Stage 1, you built a UI that presented the user with a grid of movie posters, allowed users to change sort order, and presented a screen with additional information on the movie selected by the user:
+
+
+## Languages, libraries and tools used
+
+* [Java](https://docs.oracle.com/javase/8/)
+* Android Support Libraries
+* [Picasso](https://github.com/square/picasso)
+* [Butterknife](https://github.com/JakeWharton/butterknife)
+* Room
+* Retrofit
+* ViewModel and LiveData
+
+
+## How to build the app
+
+1. Clone this repository in your local machine:
+
+2. Open Android Studio and open the project from File > Open...
+
+3. Get a developer API key from [The Movie Database](https://www.themoviedb.org/).
+
+4. Then inside the gradle.properties file substitute API_KEY with your actual API key. Remember to not push your key to any public repository. API_KEY="YOUR_API_KEY"
