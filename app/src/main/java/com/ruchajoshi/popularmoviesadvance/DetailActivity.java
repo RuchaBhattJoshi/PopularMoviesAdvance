@@ -144,7 +144,7 @@ public class DetailActivity extends AppCompatActivity {
                     } else {
                         movieViewModel.insert(movieData);
                         mMovieFavButton.setBackgroundResource(R.drawable.ic_favorite_solid_24dp);
-                        Toast.makeText(DetailActivity.this, R.string.Favorite_Removed, Toast.LENGTH_LONG)
+                        Toast.makeText(DetailActivity.this, R.string.Favorite_Added, Toast.LENGTH_LONG)
                                 .show();
                     }
 
