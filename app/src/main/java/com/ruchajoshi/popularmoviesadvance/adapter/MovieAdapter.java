@@ -52,7 +52,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
         Picasso.get()
                 .load(movieToBind)
-                .placeholder(R.mipmap.ic_launcher)
+                .placeholder(R.drawable.movie_icon)
                 .error(R.mipmap.ic_launcher)
                 .into(movieAdapterViewHolder.mMoviePoster);
     }
@@ -83,7 +83,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         public MovieAdapterViewHolder(@NonNull View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
-            //mMoviePoster = itemView.findViewById(R.id.iv_movie_poster);
             itemView.setOnClickListener(this);
         }
 

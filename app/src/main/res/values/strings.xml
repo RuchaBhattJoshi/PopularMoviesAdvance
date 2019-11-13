@@ -1,6 +1,6 @@
 <resources>
 
-    <string name="app_name">PopularMoviesAdvance</string>
+    <string name="app_name">Movies</string>
 
     <!-- MOVIE LIST -->
     <string name="image_description">Movie poster</string>
@@ -23,9 +23,12 @@
     <string name="synopsis_title">OverView</string>
 
     <!-- MOVIE API DETAIL -->
-    <string name="image_url">http://image.tmdb.org/t/p/w500%1$s</string>
+    <string name="base_url">https://api.themoviedb.org/3/</string>
+    <string name="image_url">http://image.tmdb.org/t/p/w500</string>
     <string name="url">https://api.themoviedb.org/3/movie/popular?api_key={YOUR API KEY HERE}&amp;language=en-US&amp;page=1</string>
-
+    <string name="YOUTUBE_BASE_IMAGE_URL" translatable="false">"http://img.youtube.com/vi/"</string>
+    <string name="YOUTUBE_BASE_VIDEO_URL" translatable="false">"https://youtube.com/watch?v="</string>
+    <string name="YOUTUBE_IMAGE_EXTENSION" translatable="false">"/mqdefault.jpg"</string>
 
     <!--Shared Preferences key-->
     <string name="pref_sort_key">sort_order</string>
@@ -35,11 +38,6 @@
     <string name="action_sort">Sorting</string>
     <string name="action_share">Share</string>
     <string name="action_settings">Settings</string>
-
-    <!--For Sort Labels-->
-    <string name="pref_sort_label_popular">Most Popular</string>
-    <string name="pref_sort_label_highest_rated">Highest Rated</string>
-    <string name="pref_sort_label_favorite">Favorites</string>
 
     <string name="cd_movie_item">Movie Poster</string>
     <string name="cd_video">Video</string>
@@ -64,10 +62,6 @@
     <string name="no_app">There is not any sharing app installed on device</string>
 
     <string name="view_more">READ MORE</string>
-
-    <string name="add_favorite">Added to favorites</string>
-    <string name="remove_favorite">Removed from favorites</string>
-
     <string name="connection_error">Connection Error</string>
 
     <!--For About Activity-->
@@ -76,5 +70,13 @@
     <string name="movie_transition">movie_transition</string>
     <string name="review_transition">review_transition</string>
 
+
+    <string name="Favorite_Removed">Movie removed from favorites</string>
+    <string name="Favorite_Added">Movie added to favorites</string>
+    <string name="FavoritesNotFound">No favorite Movies Found</string>
+
+    <string name="no_description_available">No Description Available</string>
+    <string name="no_review_available">No Review Available</string>
+    <string name="movie_content_description">movieImage</string>
 
 </resources>

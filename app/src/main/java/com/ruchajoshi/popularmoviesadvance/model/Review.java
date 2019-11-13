@@ -6,6 +6,7 @@ public class Review {
     private String content;
     private String id;
     private String url;
+    private boolean expanded;
 
     public Review(String author, String content, String id, String url) {
         this.author = author;
@@ -37,6 +38,12 @@ public class Review {
     }
     public void setUrl(String url) {
         this.url = url;
+    }
+    public boolean isExpanded() {
+        return expanded;
+    }
+    public void setExpanded(boolean expanded) {
+        this.expanded = expanded;
     }
 
 }

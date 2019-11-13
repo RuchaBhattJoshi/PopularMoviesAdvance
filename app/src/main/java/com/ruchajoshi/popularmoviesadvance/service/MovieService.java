@@ -1,12 +1,9 @@
 package com.ruchajoshi.popularmoviesadvance.service;
 
 
-import com.ruchajoshi.popularmoviesadvance.model.Movie;
 import com.ruchajoshi.popularmoviesadvance.model.MovieResults;
 import com.ruchajoshi.popularmoviesadvance.model.MovieReviewList;
 import com.ruchajoshi.popularmoviesadvance.model.MovieTrailerList;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;

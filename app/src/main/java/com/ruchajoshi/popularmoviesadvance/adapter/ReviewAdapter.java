@@ -5,12 +5,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.ruchajoshi.popularmoviesadvance.R;
 import com.ruchajoshi.popularmoviesadvance.model.Review;
 
 import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewHolder> {
 
@@ -28,26 +32,44 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ReviewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ReviewHolder holder, final int position) {
+        final Review review = reviews.get(position);
+        holder.bindReview(reviews.get(position));
 
-        Review review = reviews.get(position);
-        holder.author.setText(review.getAuthor());
-        holder.content.setText(review.getContent());
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                boolean expanded = review.isExpanded();
+                review.setExpanded(!expanded);
+                notifyItemChanged(position);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return reviews.size();
+        return reviews == null ? 0 : reviews.size();
     }
 
-    public class ReviewHolder extends RecyclerView.ViewHolder{
+     class ReviewHolder extends RecyclerView.ViewHolder{
 
-        public TextView author;
-        public TextView content;
-        public ReviewHolder(View itemView) {
+        @BindView(R.id.tv_author)
+        TextView review_author;
+        @BindView(R.id.tv_content)
+        TextView review_content;
+        @BindView(R.id.review_detail)
+        LinearLayout review_detail;
+
+         ReviewHolder(View itemView) {
             super(itemView);
-            author = itemView.findViewById(R.id.authorTv);
-            content = itemView.findViewById(R.id.contentTv);
+            ButterKnife.bind(this, itemView);
         }
+
+         void bindReview(Review review) {
+             boolean expanded = review.isExpanded();
+             review_detail.setVisibility(expanded ? View.VISIBLE : View.GONE);
+             review_author.setText(review.getAuthor());
+             review_content.setText(review.getContent());
+         }
     }
 }

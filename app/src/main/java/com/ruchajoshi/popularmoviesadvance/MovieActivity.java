@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ruchajoshi.popularmoviesadvance.adapter.MovieAdapter;
 import com.ruchajoshi.popularmoviesadvance.database.MovieViewModel;
@@ -40,17 +41,17 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MovieActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
     @BindView(R.id.rv_movies)
-     RecyclerView mDisplayMovieRecycleView;
+    RecyclerView mDisplayMovieRecycleView;
     @BindView(R.id.layout_empty_view)
-     ConstraintLayout mEmptyConstraintLayout;
+    ConstraintLayout mEmptyConstraintLayout;
     @BindView(R.id.progress_loading)
-     ProgressBar mEmptyProgressbar;
+    ProgressBar mEmptyProgressbar;
     @BindView(R.id.textView_empty)
-     TextView mEmptyTextview;
+    TextView mEmptyTextview;
 
     private MovieAdapter mMovieAdapter;
     private Retrofit retrofit;
-    private  MovieService service;
+    private MovieService service;
     private static final String SORT_POPULAR = "popular";
     private static final String SORT_TOP_RATED = "top_rated";
     private static final String SORT_FAVORITE = "favorite";
@@ -68,7 +69,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
 
         ButterKnife.bind(this);
 
-        mMovieAdapter = new MovieAdapter(getApplicationContext(),new ArrayList<Movie>(),MovieActivity.this);
+        mMovieAdapter = new MovieAdapter(getApplicationContext(), new ArrayList<Movie>(), MovieActivity.this);
         int mNoOfColumns = calculateNoOfColumns(getApplicationContext());
         movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
@@ -89,11 +90,11 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
     }
 
     private void loadMovieData() {
-        Log.i("currentSort","-"+currentSort);
+        Log.i("currentSort", "-" + currentSort);
 
-        if(isInternetAvailable()){
+        if (isInternetAvailable()) {
             showResult();
-            if(currentSort.equals(SORT_POPULAR)){
+            if (currentSort.equals(SORT_POPULAR)) {
                 retrofit = new Retrofit.Builder()
                         .baseUrl("https://api.themoviedb.org/3/")
                         .addConverterFactory(GsonConverterFactory.create())
@@ -102,15 +103,14 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                 service = retrofit.create(MovieService.class);
 
                 final Call<MovieResults> getMostPopluar = service.getMostPopular(BuildConfig.API_KEY);
-                getMostPopluar.enqueue(new Callback<MovieResults>(){
+                getMostPopluar.enqueue(new Callback<MovieResults>() {
                     @Override
                     public void onResponse(Call<MovieResults> call, Response<MovieResults> response) {
-                        if(response.isSuccessful()){
+                        if (response.isSuccessful()) {
                             mMovieAdapter.setMovies(response.body().getMovies());
 
-                        }
-                        else{
-                            Log.i("response failed","failed"+response.code());
+                        } else {
+                            Log.i("response failed", "failed" + response.code());
                         }
 
                     }
@@ -121,8 +121,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                     }
                 });
 
-            }
-            else if(currentSort.equals(SORT_TOP_RATED)){
+            } else if (currentSort.equals(SORT_TOP_RATED)) {
                 retrofit = new Retrofit.Builder()
                         .baseUrl("https://api.themoviedb.org/3/")
                         .addConverterFactory(GsonConverterFactory.create())
@@ -131,15 +130,13 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                 service = retrofit.create(MovieService.class);
 
                 final Call<MovieResults> gettoprated = service.getTopRated(BuildConfig.API_KEY);
-                gettoprated.enqueue(new Callback<MovieResults>(){
+                gettoprated.enqueue(new Callback<MovieResults>() {
                     @Override
                     public void onResponse(Call<MovieResults> call, Response<MovieResults> response) {
-                        if(response.isSuccessful()){
+                        if (response.isSuccessful()) {
                             mMovieAdapter.setMovies(response.body().getMovies());
-                            Log.i("response sucess","sucess"+response.body().getMovies());
-                        }
-                        else{
-                            Log.i("response failed","failed"+response.code());
+                        } else {
+                            Log.i("response failed", "failed" + response.code());
                         }
 
                     }
@@ -150,23 +147,23 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                     }
                 });
 
-            }
-            else if(currentSort.equals(SORT_FAVORITE)){
+            } else if (currentSort.equals(SORT_FAVORITE)) {
                 favouriteMoviesObserver = new Observer<List<Movie>>() {
                     @Override
                     public void onChanged(@Nullable List<Movie> movies) {
-                        mMovieAdapter.setMovies(movies);
-                        Log.i("favmovies","-"+movies.size());
-                        Log.i("favmovies","-"+movies.get(1).getTitle());
 
+                        if (movies.size() != 0) {
+                            mMovieAdapter.setMovies(movies);
+                        } else {
+                            Toast.makeText(MovieActivity.this, R.string.FavoritesNotFound, Toast.LENGTH_LONG)
+                                    .show();
+                        }
                     }
                 };
 
-                movieViewModel.getAllMovies().observe(this,favouriteMoviesObserver);
+                movieViewModel.getAllMovies().observe(this, favouriteMoviesObserver);
             }
-        }
-
-        else{
+        } else {
             showErrorMessage();
         }
     }
@@ -191,9 +188,9 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
 
     @Override
     public void onClick(int adapterPosition) {
-        Intent intentToDeatilActivity = new Intent(this, DetailActivity.class);
-        intentToDeatilActivity.putExtra("MovieData", mMovieAdapter.getMoviePosition(adapterPosition));
-        startActivity(intentToDeatilActivity);
+        Intent intentToDetailActivity = new Intent(this, DetailActivity.class);
+        intentToDetailActivity.putExtra("MovieData", mMovieAdapter.getMoviePosition(adapterPosition));
+        startActivity(intentToDetailActivity);
     }
 
 
