@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -40,6 +41,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
+    private static final String SAVED_RECYCLER_VIEW_STATUS_ID ="RECYCLER_VIEW_STATUS_ID" ;
+    private static final String SAVED_RECYCLER_VIEW_DATASET_ID ="RECYCLER_VIEW_DATASET_ID" ;
+
+
     @BindView(R.id.rv_movies)
     RecyclerView mDisplayMovieRecycleView;
     @BindView(R.id.layout_empty_view)
@@ -49,6 +54,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
     @BindView(R.id.textView_empty)
     TextView mEmptyTextview;
 
+    GridLayoutManager layoutManager;
     private MovieAdapter mMovieAdapter;
     private Retrofit retrofit;
     private MovieService service;
@@ -57,10 +63,9 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
     private static final String SORT_FAVORITE = "favorite";
     private static String currentSort = SORT_POPULAR;
 
-
     private MovieViewModel movieViewModel;
     private Observer<List<Movie>> favouriteMoviesObserver;
-    private int sort = 0;
+    private  List<Movie> movies = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,18 +73,56 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
         setContentView(R.layout.activity_movie);
 
         ButterKnife.bind(this);
-
         mMovieAdapter = new MovieAdapter(getApplicationContext(), new ArrayList<Movie>(), MovieActivity.this);
         int mNoOfColumns = calculateNoOfColumns(getApplicationContext());
         movieViewModel = ViewModelProviders.of(this).get(MovieViewModel.class);
 
-        GridLayoutManager layoutManager = new GridLayoutManager(this, mNoOfColumns);
+        layoutManager = new GridLayoutManager(this, mNoOfColumns);
         mDisplayMovieRecycleView.setLayoutManager(layoutManager);
         mDisplayMovieRecycleView.setHasFixedSize(true);
         mDisplayMovieRecycleView.setAdapter(mMovieAdapter);
 
         loadMovieData();
 
+        if (savedInstanceState==null){
+            loadMovieData(); // No saved data, get data from remote
+        }else{
+            restorePreviousState(savedInstanceState); // Restore data found in the Bundle
+        }
+
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+
+        Parcelable listState = mDisplayMovieRecycleView.getLayoutManager().onSaveInstanceState();
+
+        // putting recyclerview position
+        outState.putParcelable(SAVED_RECYCLER_VIEW_STATUS_ID, listState);
+
+        //putting selected sorting
+        //outState.putBoolean(MOST_POPULAR_OPTION_CHECKED, mostPopularOptionChecked);
+        //outState.putBoolean(TOP_RATED_OPTION_CHECKED, topRatedOptionChecked);
+
+        // putting recyclerview items
+        //outState.putParcelableArrayList(SAVED_RECYCLER_VIEW_DATASET_ID,mMovieList);
+
+        super.onSaveInstanceState(outState);
+
+    }
+
+    private void restorePreviousState(Bundle mSavedInstanceState) {
+        // getting recyclerview position
+        Parcelable mListState = mSavedInstanceState.getParcelable(SAVED_RECYCLER_VIEW_STATUS_ID);
+
+        // getting recyclerview items
+       // mMovieList = mSavedInstanceState.getParcelableArrayList(SAVED_RECYCLER_VIEW_DATASET_ID);
+
+        // Restoring adapter items
+       // mMovieAdapter.setMovies(mMovieList);
+
+        // Restoring recycler view position
+        mDisplayMovieRecycleView.getLayoutManager().onRestoreInstanceState(mListState);
     }
 
     public static int calculateNoOfColumns(Context context) {
@@ -93,7 +136,9 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
         Log.i("currentSort", "-" + currentSort);
 
         if (isInternetAvailable()) {
+
             showResult();
+
             if (currentSort.equals(SORT_POPULAR)) {
                 retrofit = new Retrofit.Builder()
                         .baseUrl("https://api.themoviedb.org/3/")
@@ -107,8 +152,8 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                     @Override
                     public void onResponse(Call<MovieResults> call, Response<MovieResults> response) {
                         if (response.isSuccessful()) {
+                            movies.addAll(response.body().getMovies());
                             mMovieAdapter.setMovies(response.body().getMovies());
-
                         } else {
                             Log.i("response failed", "failed" + response.code());
                         }
@@ -121,7 +166,9 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                     }
                 });
 
-            } else if (currentSort.equals(SORT_TOP_RATED)) {
+            }
+
+            else if (currentSort.equals(SORT_TOP_RATED)) {
                 retrofit = new Retrofit.Builder()
                         .baseUrl("https://api.themoviedb.org/3/")
                         .addConverterFactory(GsonConverterFactory.create())
@@ -134,6 +181,7 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                     @Override
                     public void onResponse(Call<MovieResults> call, Response<MovieResults> response) {
                         if (response.isSuccessful()) {
+                            movies.addAll(response.body().getMovies());
                             mMovieAdapter.setMovies(response.body().getMovies());
                         } else {
                             Log.i("response failed", "failed" + response.code());
@@ -147,22 +195,8 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
                     }
                 });
 
-            } else if (currentSort.equals(SORT_FAVORITE)) {
-                favouriteMoviesObserver = new Observer<List<Movie>>() {
-                    @Override
-                    public void onChanged(@Nullable List<Movie> movies) {
-
-                        if (movies.size() != 0) {
-                            mMovieAdapter.setMovies(movies);
-                        } else {
-                            Toast.makeText(MovieActivity.this, R.string.FavoritesNotFound, Toast.LENGTH_LONG)
-                                    .show();
-                        }
-                    }
-                };
-
-                movieViewModel.getAllMovies().observe(this, favouriteMoviesObserver);
             }
+
         } else {
             showErrorMessage();
         }
@@ -218,10 +252,45 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
 
         if (menuItemSelected == R.id.action_favorite && !currentSort.equals(SORT_FAVORITE)) {
             currentSort = SORT_FAVORITE;
-            loadMovieData();
+            favouriteMoviesObserver = new Observer<List<Movie>>() {
+                @Override
+                public void onChanged(@Nullable List<Movie> movies) {
+                    if (movies.size() != 0) {
+                        mMovieAdapter.setMovies(movies);
+                    } else {
+                        mMovieAdapter.setMovies(movies);
+                        Toast.makeText(MovieActivity.this, R.string.FavoritesNotFound, Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+
+            movieViewModel.getAllMovies().observe(this, favouriteMoviesObserver);
+
             return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
+
+
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        index = layoutManager.findFirstCompletelyVisibleItemPosition();
+//        View v = mDisplayMovieRecycleView.getChildAt(0);
+//        top= (v==null) ? 0 : (v.getTop() - mDisplayMovieRecycleView.getPaddingTop());
+//    }
+//
+//
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        if(index!=-1){
+//            layoutManager.scrollToPositionWithOffset(index,top);
+//        }
+//    }
+
+
+
 }
