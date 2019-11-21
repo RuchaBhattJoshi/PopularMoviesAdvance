@@ -44,6 +44,8 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
     private static final String SAVED_RECYCLER_VIEW_STATUS_ID ="RECYCLER_VIEW_STATUS_ID" ;
     private static final String SAVED_RECYCLER_VIEW_DATASET_ID ="RECYCLER_VIEW_DATASET_ID" ;
 
+    public final static String LIST_STATE_KEY = "recycler_list_state";
+    Parcelable listState;
 
     @BindView(R.id.rv_movies)
     RecyclerView mDisplayMovieRecycleView;
@@ -84,21 +86,20 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
 
         loadMovieData();
 
-        if (savedInstanceState==null){
-            loadMovieData(); // No saved data, get data from remote
-        }else{
-            restorePreviousState(savedInstanceState); // Restore data found in the Bundle
-        }
+//        if (savedInstanceState==null){
+//            loadMovieData(); // No saved data, get data from remote
+//        }else{
+//            restorePreviousState(savedInstanceState); // Restore data found in the Bundle
+//        }
 
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-
-        Parcelable listState = mDisplayMovieRecycleView.getLayoutManager().onSaveInstanceState();
-
+        super.onSaveInstanceState(outState);
+        listState = mDisplayMovieRecycleView.getLayoutManager().onSaveInstanceState();
         // putting recyclerview position
-        outState.putParcelable(SAVED_RECYCLER_VIEW_STATUS_ID, listState);
+        outState.putParcelable(LIST_STATE_KEY, listState);
 
         //putting selected sorting
         //outState.putBoolean(MOST_POPULAR_OPTION_CHECKED, mostPopularOptionChecked);
@@ -107,22 +108,23 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
         // putting recyclerview items
         //outState.putParcelableArrayList(SAVED_RECYCLER_VIEW_DATASET_ID,mMovieList);
 
-        super.onSaveInstanceState(outState);
-
     }
 
-    private void restorePreviousState(Bundle mSavedInstanceState) {
-        // getting recyclerview position
-        Parcelable mListState = mSavedInstanceState.getParcelable(SAVED_RECYCLER_VIEW_STATUS_ID);
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
 
-        // getting recyclerview items
-       // mMovieList = mSavedInstanceState.getParcelableArrayList(SAVED_RECYCLER_VIEW_DATASET_ID);
+        if(savedInstanceState != null)
+            listState = savedInstanceState.getParcelable(LIST_STATE_KEY);
+    }
 
-        // Restoring adapter items
-       // mMovieAdapter.setMovies(mMovieList);
 
-        // Restoring recycler view position
-        mDisplayMovieRecycleView.getLayoutManager().onRestoreInstanceState(mListState);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (listState != null) {
+            mDisplayMovieRecycleView.getLayoutManager().onRestoreInstanceState(listState);
+        }
     }
 
     public static int calculateNoOfColumns(Context context) {
@@ -219,7 +221,6 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
         mEmptyConstraintLayout.setVisibility(View.VISIBLE);
     }
 
-
     @Override
     public void onClick(int adapterPosition) {
         Intent intentToDetailActivity = new Intent(this, DetailActivity.class);
@@ -271,26 +272,6 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
 
         return super.onOptionsItemSelected(item);
     }
-
-
-
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        index = layoutManager.findFirstCompletelyVisibleItemPosition();
-//        View v = mDisplayMovieRecycleView.getChildAt(0);
-//        top= (v==null) ? 0 : (v.getTop() - mDisplayMovieRecycleView.getPaddingTop());
-//    }
-//
-//
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        if(index!=-1){
-//            layoutManager.scrollToPositionWithOffset(index,top);
-//        }
-//    }
-
 
 
 }
