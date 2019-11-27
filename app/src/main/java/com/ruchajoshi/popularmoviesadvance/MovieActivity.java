@@ -41,9 +41,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MovieActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
-    private static final String SAVED_RECYCLER_VIEW_STATUS_ID ="RECYCLER_VIEW_STATUS_ID" ;
-    private static final String SAVED_RECYCLER_VIEW_DATASET_ID ="RECYCLER_VIEW_DATASET_ID" ;
-
     public final static String LIST_STATE_KEY = "recycler_list_state";
     Parcelable listState;
 
@@ -67,7 +64,9 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
 
     private MovieViewModel movieViewModel;
     private Observer<List<Movie>> favouriteMoviesObserver;
-    private  List<Movie> movies = new ArrayList<>();
+    private  ArrayList<Movie> movies = new ArrayList<>();
+    private String MOVIES_KEY="movies";
+    private String CURRENT_SORT="currentSorting";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,36 +83,34 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
         mDisplayMovieRecycleView.setHasFixedSize(true);
         mDisplayMovieRecycleView.setAdapter(mMovieAdapter);
 
-        loadMovieData();
-
-//        if (savedInstanceState==null){
-//            loadMovieData(); // No saved data, get data from remote
-//        }else{
-//            restorePreviousState(savedInstanceState); // Restore data found in the Bundle
-//        }
+        if (savedInstanceState==null){
+            loadMovieData(); // No saved data, get data from remote
+        }else{
+            currentSort = savedInstanceState.getString(CURRENT_SORT);
+            if(currentSort.equals(SORT_FAVORITE)){
+               setFavoriteMovies();
+            }
+            else{
+                movies=savedInstanceState.getParcelableArrayList(MOVIES_KEY);
+                mMovieAdapter.setMovies(movies);
+            }
+        }
 
     }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         listState = mDisplayMovieRecycleView.getLayoutManager().onSaveInstanceState();
-        // putting recyclerview position
         outState.putParcelable(LIST_STATE_KEY, listState);
-
-        //putting selected sorting
-        //outState.putBoolean(MOST_POPULAR_OPTION_CHECKED, mostPopularOptionChecked);
-        //outState.putBoolean(TOP_RATED_OPTION_CHECKED, topRatedOptionChecked);
-
-        // putting recyclerview items
-        //outState.putParcelableArrayList(SAVED_RECYCLER_VIEW_DATASET_ID,mMovieList);
-
+        outState.putParcelableArrayList(MOVIES_KEY,movies);
+        outState.putString(CURRENT_SORT,currentSort);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-
         if(savedInstanceState != null)
             listState = savedInstanceState.getParcelable(LIST_STATE_KEY);
     }
@@ -126,6 +123,8 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
             mDisplayMovieRecycleView.getLayoutManager().onRestoreInstanceState(listState);
         }
     }
+
+
 
     public static int calculateNoOfColumns(Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
@@ -199,6 +198,10 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
 
             }
 
+            else if (currentSort.equals(SORT_FAVORITE)) {
+                setFavoriteMovies();
+            }
+
         } else {
             showErrorMessage();
         }
@@ -253,24 +256,28 @@ public class MovieActivity extends AppCompatActivity implements MovieAdapter.Mov
 
         if (menuItemSelected == R.id.action_favorite && !currentSort.equals(SORT_FAVORITE)) {
             currentSort = SORT_FAVORITE;
-            favouriteMoviesObserver = new Observer<List<Movie>>() {
-                @Override
-                public void onChanged(@Nullable List<Movie> movies) {
-                    if (movies.size() != 0) {
-                        mMovieAdapter.setMovies(movies);
-                    } else {
-                        mMovieAdapter.setMovies(movies);
-                        Toast.makeText(MovieActivity.this, R.string.FavoritesNotFound, Toast.LENGTH_LONG).show();
-                    }
-                }
-            };
-
-            movieViewModel.getAllMovies().observe(this, favouriteMoviesObserver);
-
+            loadMovieData();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private void setFavoriteMovies() {
+        favouriteMoviesObserver = new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                if (movies.size() != 0) {
+                    mMovieAdapter.setMovies(movies);
+                } else {
+                    mMovieAdapter.setMovies(movies);
+                    Toast.makeText(MovieActivity.this, R.string.FavoritesNotFound, Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+
+        movieViewModel.getAllMovies().observe(this, favouriteMoviesObserver);
     }
 
 
